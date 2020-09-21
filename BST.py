@@ -1,74 +1,107 @@
+from collections import deque
+
 class Bst:
     def __init__(self,data):
         self.data=data
-        self.right=None
         self.left=None
+        self.right=None
+
     def add_child(self,data):
-        if data < self.data:
+        if self.data==data:
+            return False
+        if self.data > data:
             if self.left:
                 self.left.add_child(data)
             else:
                 self.left=Bst(data)
-        if data > self.data:
+        else:
             if self.right:
                 self.right.add_child(data)
             else:
                 self.right=Bst(data)
-    def printt(self):
-        ele=[]
-        if self.left:
-            ele+=self.left.printt()
-        ele.append(self.data)
-        if self.right:
-            ele+=self.right.printt()
-        return ele
 
-    def search(self,data):
-        if self.data==data:
-            return True
-        if self.data > data:
-            if self.left:
-                return self.left.search(data)
-            else:
-                return False
-        if self.data < data:
-            if self.right:
-                return self.right.search(data)
-            else:
-                return False
-    def find_max(self):
-        if self.right is None:
-            return self.right
-        return self.right.find_max()
-    def find_min(self):
-        if self.left is None:
-            return self.left
-        return self.left.find_min()
+    def in_order_traversal(self):
+        elements=[]
+        if self.left:
+            elements+=self.left.in_order_traversal()
+        elements.append(self.data)
+        if self.right:
+            elements+=self.right.in_order_traversal()
+        return elements
+
+    def pre_order_traversal(self):
+        elements=[]
+        elements.append(self.data)
+        if self.left:
+            elements+=self.left.pre_order_traversal()
+        if self.right:
+            elements+=self.right.pre_order_traversal()
+        return elements
+
+    def post_order_traversal(self):
+        elements = []
+        if self.left:
+            elements+=self.left.post_order_traversal()
+        if self.right:
+            elements+=self.right.post_order_traversal()
+        elements.append(self.data)
+        return elements
+
     def delete(self,data):
         if self.data > data:
             if self.left:
-                return self.left.delete(data)
+                self.left=self.left.delete(data)
         elif self.data < data:
             if self.right:
-                return self.right.delete(data)
+                self.right=self.right.delete(data)
         else:
             if self.left is None and self.right is None:
                 return None
-            elif self.left is None:
-                return self.right
             elif self.right is None:
                 return self.left
+            elif self.left is None:
+                return self.right
+            min_val=self.right.find_min()
+            self.data=min_val
+            self.right=self.right.delete(min_val)
 
-def built_tree(list):
-    root=Bst(list[0])
-    for ele in range(1,len(list)):
-        root.add_child(list[ele])
+        return self
+
+    def level_order_traversal(self):
+        if self is None:
+            return None
+        queue=deque()
+        queue.append(self)
+        while len(queue)> 0:
+            ft =queue.popleft()
+            print(ft.data,end=" ")
+            if ft.left is not None:
+                queue.append(ft.left)
+            if ft.right is not None:
+                queue.append(ft.right)
+
+    def find_max(self):
+        if self.right is None:
+            return self.data
+        return self.right.find_max()
+    def find_min(self):
+        if self.left is None:
+            return self.data
+        return self.left.find_min()
+
+def root_tree(l):
+    root=Bst(l[0])
+    for i in range(1,len(l)):
+        root.add_child(l[i])
     return root
 
+
 if __name__=='__main__':
-    list=[2,5,7,6,8,4]
-    bt=built_tree(list)
-    print(bt.printt())
-    print(bt.search(8))
-    bt.delete(7)
-    print(bt.printt())
+    l=[5,3,7,4,2,8,6]
+    bst=root_tree(l)
+    print(bst.in_order_traversal())
+    print(bst.pre_order_traversal())
+    print(bst.post_order_traversal())
+    bst.level_order_traversal()
+    bst.delete(7)
+    print(bst.in_order_traversal())
